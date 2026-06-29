@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ให้คะแนนการซ่อม</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .card { background: #fff; border-radius: 20px; padding: 32px 24px; max-width: 420px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,.10); }
+  .card h1 { font-size: 1.4rem; color: #1a1a2e; margin-bottom: 4px; }
+  .subtitle { color: #888; font-size: .85rem; margin-bottom: 20px; }
+  .info-box { background: #f8f9ff; border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; }
+  .info-row { display: flex; justify-content: space-between; font-size: .88rem; padding: 3px 0; color: #444; }
+  .info-row span:last-child { color: #1a1a2e; font-weight: 600; text-align: right; max-width: 60%; }
+  .section-label { font-size: .9rem; font-weight: 600; color: #444; margin-bottom: 10px; }
+  .stars { display: flex; justify-content: center; gap: 10px; margin-bottom: 8px; }
+  .star { font-size: 2.6rem; cursor: pointer; transition: transform .15s; user-select: none; filter: grayscale(1) opacity(.35); }
+  .star.active { filter: none; transform: scale(1.15); }
+  .star:hover { transform: scale(1.2); filter: none; }
+  .star-label { text-align: center; font-size: .88rem; color: #888; min-height: 20px; margin-bottom: 20px; }
+  textarea { width: 100%; border: 1.5px solid #dde2ee; border-radius: 12px; padding: 12px 14px; font-size: .95rem; resize: none; font-family: inherit; outline: none; transition: border-color .2s; }
+  textarea:focus { border-color: #FFB800; }
+  .btn { display: block; width: 100%; margin-top: 18px; padding: 14px; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity .2s, transform .1s; }
+  .btn:active { transform: scale(.98); }
+  .btn-submit { background: linear-gradient(135deg, #FFB800, #FF8C00); color: #fff; }
+  .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+  .done-view { text-align: center; padding: 20px 0; }
+  .done-view .big-star { font-size: 4rem; }
+  .done-view h2 { margin: 12px 0 6px; color: #1a1a2e; }
+  .done-view p { color: #888; font-size: .9rem; }
+  .loading { text-align: center; padding: 40px 0; color: #888; }
+  .error { text-align: center; padding: 20px 0; color: #d32f2f; }
+</style>
+</head>
+<body>
+<div class="card" id="app">
+  <div class="loading">⏳ กำลังโหลด...</div>
+</div>
+
+<script>
+const GAS_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
+
+const STAR_LABELS = ["", "แย่มาก 😞", "พอใช้ 😐", "ปานกลาง 🙂", "ดี 😊", "ดีมาก 🤩"];
+
+const params = new URLSearchParams(location.search);
+const jobId  = params.get("job") || "";
+let selectedScore = 0;
+let jobData = null;
+
+async function init() {
+  if (!jobId) { showError("ไม่พบเลขงาน กรุณาสแกน QR ใหม่"); return; }
+  try {
+    const res  = await fetch(GAS_URL + "?type=get_job&jobId=" + encodeURIComponent(jobId));
+    const data = await res.json();
+    if (data.status !== "success") { showError("ไม่พบงานเลขที่ " + jobId); return; }
+    jobData = data.job;
+    if (data.alreadyRated) { showDone(jobData.rating, jobData.ratingComment, true); return; }
+    renderForm();
+  } catch(e) { showError("เชื่อมต่อไม่ได้ กรุณาลองใหม่"); }
+}
+
+function renderForm() {
+  document.getElementById("app").innerHTML = `
+    <h1>⭐ ให้คะแนนการซ่อม</h1>
+    <p class="subtitle">${jobId}</p>
+    <div class="info-box">
+      <div class="info-row"><span>หัวข้อ</span><span>${jobData.topic}</span></div>
+      <div class="info-row"><span>ช่าง</span><span>${jobData.receiverName || "-"}</span></div>
+      <div class="info-row"><span>แผนก</span><span>${jobData.department}</span></div>
+      <div class="info-row"><span>เสร็จเมื่อ</span><span>${formatDate(jobData.finishTime)}</span></div>
+    </div>
+    <div class="section-label">ความพึงพอใจ</div>
+    <div class="stars" id="stars">
+      ${[1,2,3,4,5].map(s => `<span class="star" data-score="${s}" onclick="selectStar(${s})">⭐</span>`).join("")}
+    </div>
+    <div class="star-label" id="starLabel">กรุณาเลือกคะแนน</div>
+    <div class="section-label">ความคิดเห็น (ไม่บังคับ)</div>
+    <textarea id="comment" rows="3" placeholder="เขียนความคิดเห็นเพิ่มเติม..."></textarea>
+    <button class="btn btn-submit" id="submitBtn" disabled onclick="submitRating()">ส่งคะแนน</button>
+  `;
+}
+
+function selectStar(score) {
+  selectedScore = score;
+  document.querySelectorAll(".star").forEach((el, i) => {
+    el.classList.toggle("active", i < score);
+  });
+  document.getElementById("starLabel").textContent = STAR_LABELS[score];
+  document.getElementById("submitBtn").disabled = false;
+}
+
+async function submitRating() {
+  if (!selectedScore) return;
+  const btn     = document.getElementById("submitBtn");
+  const comment = document.getElementById("comment").value.trim();
+  btn.disabled  = true;
+  btn.textContent = "⏳ กำลังส่ง...";
+  try {
+    const url = GAS_URL + "?type=rate_job&jobId=" + encodeURIComponent(jobId)
+              + "&score=" + selectedScore
+              + "&comment=" + encodeURIComponent(comment);
+    const res  = await fetch(url);
+    const data = await res.json();
+    if (data.status === "success" || data.status === "already_rated") {
+      showDone(selectedScore, comment, data.status === "already_rated");
+    } else {
+      btn.disabled    = false;
+      btn.textContent = "ส่งคะแนน";
+      alert("เกิดข้อผิดพลาด: " + data.status);
+    }
+  } catch(e) {
+    btn.disabled    = false;
+    btn.textContent = "ส่งคะแนน";
+    alert("เชื่อมต่อไม่ได้ กรุณาลองใหม่");
+  }
+}
+
+function showDone(score, comment, wasAlready) {
+  document.getElementById("app").innerHTML = `
+    <div class="done-view">
+      <div class="big-star">${"⭐".repeat(Number(score)||0)}</div>
+      <h2>${wasAlready ? "ให้คะแนนไปแล้ว" : "ขอบคุณสำหรับคะแนน!"}</h2>
+      <p>${wasAlready ? "งาน " + jobId + " นี้ได้รับการให้คะแนนแล้ว" : "คะแนนของคุณถูกบันทึกเรียบร้อยแล้ว"}</p>
+      ${comment ? `<p style="margin-top:12px;color:#555;">"${comment}"</p>` : ""}
+    </div>
+  `;
+}
+
+function showError(msg) {
+  document.getElementById("app").innerHTML = `<div class="error">❌ ${msg}</div>`;
+}
+
+function formatDate(d) {
+  if (!d) return "-";
+  const dt = new Date(d);
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString("th-TH") + " " + dt.toLocaleTimeString("th-TH", {hour:"2-digit",minute:"2-digit"});
+}
+
+init();
+</script>
+</body>
+</html>
