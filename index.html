@@ -2,143 +2,145 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ให้คะแนนการซ่อม</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ให้คะแนนงานซ่อมบำรุง</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .card { background: #fff; border-radius: 20px; padding: 32px 24px; max-width: 420px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,.10); }
-  .card h1 { font-size: 1.4rem; color: #1a1a2e; margin-bottom: 4px; }
-  .subtitle { color: #888; font-size: .85rem; margin-bottom: 20px; }
-  .info-box { background: #f8f9ff; border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; }
-  .info-row { display: flex; justify-content: space-between; font-size: .88rem; padding: 3px 0; color: #444; }
-  .info-row span:last-child { color: #1a1a2e; font-weight: 600; text-align: right; max-width: 60%; }
-  .section-label { font-size: .9rem; font-weight: 600; color: #444; margin-bottom: 10px; }
-  .stars { display: flex; justify-content: center; gap: 10px; margin-bottom: 8px; }
-  .star { font-size: 2.6rem; cursor: pointer; transition: transform .15s; user-select: none; filter: grayscale(1) opacity(.35); }
-  .star.active { filter: none; transform: scale(1.15); }
-  .star:hover { transform: scale(1.2); filter: none; }
-  .star-label { text-align: center; font-size: .88rem; color: #888; min-height: 20px; margin-bottom: 20px; }
-  textarea { width: 100%; border: 1.5px solid #dde2ee; border-radius: 12px; padding: 12px 14px; font-size: .95rem; resize: none; font-family: inherit; outline: none; transition: border-color .2s; }
-  textarea:focus { border-color: #FFB800; }
-  .btn { display: block; width: 100%; margin-top: 18px; padding: 14px; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity .2s, transform .1s; }
-  .btn:active { transform: scale(.98); }
-  .btn-submit { background: linear-gradient(135deg, #FFB800, #FF8C00); color: #fff; }
-  .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
-  .done-view { text-align: center; padding: 20px 0; }
-  .done-view .big-star { font-size: 4rem; }
-  .done-view h2 { margin: 12px 0 6px; color: #1a1a2e; }
-  .done-view p { color: #888; font-size: .9rem; }
-  .loading { text-align: center; padding: 40px 0; color: #888; }
-  .error { text-align: center; padding: 20px 0; color: #d32f2f; }
+/* ── ใส่ GAS URL ของคุณตรงนี้ ── */
+/* GAS_URL ถูกกำหนดใน <script> ด้านล่าง */
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',Helvetica,sans-serif;background:#1a1a2e;color:#eee;padding:20px;min-height:100vh}
+.wrap{max-width:460px;margin:0 auto}
+h2{text-align:center;color:#ff9800;font-size:22px;margin-bottom:4px}
+.sub{text-align:center;color:#aaa;font-size:13px;margin-bottom:24px;word-break:break-all}
+.card{background:#16213e;border-radius:14px;padding:18px;margin-bottom:14px;
+      box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.clabel{font-size:15px;font-weight:700;color:#ffe082;margin-bottom:14px;line-height:1.4}
+.stars{display:flex;justify-content:center;gap:10px}
+.star{font-size:42px;cursor:pointer;color:#2a2a4a;transition:color .1s;
+      -webkit-tap-highlight-color:transparent;user-select:none;line-height:1}
+.star.on{color:#ffd700}
+.star:active{transform:scale(1.2)}
+.btn{width:100%;padding:15px;background:#ff9800;color:#000;
+     font-size:18px;font-weight:700;border:none;border-radius:12px;
+     cursor:pointer;margin-top:8px;letter-spacing:.5px}
+.btn:disabled{background:#333;color:#555;cursor:default}
+#done{display:none;text-align:center;padding:60px 20px}
+.done-icon{font-size:64px}
+.done-text{font-size:22px;color:#66bb6a;margin-top:16px;font-weight:700}
+.done-sub{font-size:14px;color:#aaa;margin-top:8px}
+#err{display:none;text-align:center;color:#ef5350;padding:12px;font-size:14px}
 </style>
 </head>
 <body>
-<div class="card" id="app">
-  <div class="loading">⏳ กำลังโหลด...</div>
+<div class="wrap">
+  <h2>⭐ ให้คะแนนงานซ่อมบำรุง</h2>
+  <div class="sub" id="subtitle">กำลังโหลด...</div>
+
+  <div id="form">
+    <div class="card">
+      <div class="clabel">1. ความถูกต้องการแก้ปัญหา</div>
+      <div class="stars" id="g1">
+        <span class="star" data-g="1" data-v="1" onclick="pick(this)">★</span>
+        <span class="star" data-g="1" data-v="2" onclick="pick(this)">★</span>
+        <span class="star" data-g="1" data-v="3" onclick="pick(this)">★</span>
+        <span class="star" data-g="1" data-v="4" onclick="pick(this)">★</span>
+        <span class="star" data-g="1" data-v="5" onclick="pick(this)">★</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="clabel">2. ความสะอาดเรียบร้อยหลังเสร็จงาน</div>
+      <div class="stars" id="g2">
+        <span class="star" data-g="2" data-v="1" onclick="pick(this)">★</span>
+        <span class="star" data-g="2" data-v="2" onclick="pick(this)">★</span>
+        <span class="star" data-g="2" data-v="3" onclick="pick(this)">★</span>
+        <span class="star" data-g="2" data-v="4" onclick="pick(this)">★</span>
+        <span class="star" data-g="2" data-v="5" onclick="pick(this)">★</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="clabel">3. ทำงานด้วยความปลอดภัย</div>
+      <div class="stars" id="g3">
+        <span class="star" data-g="3" data-v="1" onclick="pick(this)">★</span>
+        <span class="star" data-g="3" data-v="2" onclick="pick(this)">★</span>
+        <span class="star" data-g="3" data-v="3" onclick="pick(this)">★</span>
+        <span class="star" data-g="3" data-v="4" onclick="pick(this)">★</span>
+        <span class="star" data-g="3" data-v="5" onclick="pick(this)">★</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="clabel">4. คุณภาพของงานที่เสร็จ</div>
+      <div class="stars" id="g4">
+        <span class="star" data-g="4" data-v="1" onclick="pick(this)">★</span>
+        <span class="star" data-g="4" data-v="2" onclick="pick(this)">★</span>
+        <span class="star" data-g="4" data-v="3" onclick="pick(this)">★</span>
+        <span class="star" data-g="4" data-v="4" onclick="pick(this)">★</span>
+        <span class="star" data-g="4" data-v="5" onclick="pick(this)">★</span>
+      </div>
+    </div>
+
+    <div id="err">❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง</div>
+    <button class="btn" id="sb" disabled onclick="send()">ส่งคะแนน ✅</button>
+  </div>
+
+  <div id="done">
+    <div class="done-icon">✅</div>
+    <div class="done-text">ขอบคุณสำหรับการให้คะแนน!</div>
+    <div class="done-sub">คะแนนของคุณถูกบันทึกเรียบร้อยแล้ว</div>
+  </div>
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
+// =========================================
+// ⚠️ ใส่ URL จาก GAS Deploy ของคุณตรงนี้
+const GAS_URL = "https://script.google.com/macros/s/YOUR_DEPLOY_ID/exec";
+// =========================================
 
-const STAR_LABELS = ["", "แย่มาก 😞", "พอใช้ 😐", "ปานกลาง 🙂", "ดี 😊", "ดีมาก 🤩"];
+const sc = {1:0, 2:0, 3:0, 4:0};
+const jobId = new URLSearchParams(location.search).get("jobId") || "";
 
-const params = new URLSearchParams(location.search);
-const jobId  = params.get("job") || "";
-let selectedScore = 0;
-let jobData = null;
+document.getElementById("subtitle").textContent =
+  jobId ? `งานหมายเลข: ${jobId}` : "ไม่พบรหัสงาน";
 
-async function init() {
-  if (!jobId) { showError("ไม่พบเลขงาน กรุณาสแกน QR ใหม่"); return; }
-  try {
-    const res  = await fetch(GAS_URL + "?type=get_job&jobId=" + encodeURIComponent(jobId));
-    const data = await res.json();
-    if (data.status !== "success") { showError("ไม่พบงานเลขที่ " + jobId); return; }
-    jobData = data.job;
-    if (data.alreadyRated) { showDone(jobData.rating, jobData.ratingComment, true); return; }
-    renderForm();
-  } catch(e) { showError("เชื่อมต่อไม่ได้ กรุณาลองใหม่"); }
-}
-
-function renderForm() {
-  document.getElementById("app").innerHTML = `
-    <h1>⭐ ให้คะแนนการซ่อม</h1>
-    <p class="subtitle">${jobId}</p>
-    <div class="info-box">
-      <div class="info-row"><span>หัวข้อ</span><span>${jobData.topic}</span></div>
-      <div class="info-row"><span>ช่าง</span><span>${jobData.receiverName || "-"}</span></div>
-      <div class="info-row"><span>แผนก</span><span>${jobData.department}</span></div>
-      <div class="info-row"><span>เสร็จเมื่อ</span><span>${formatDate(jobData.finishTime)}</span></div>
-    </div>
-    <div class="section-label">ความพึงพอใจ</div>
-    <div class="stars" id="stars">
-      ${[1,2,3,4,5].map(s => `<span class="star" data-score="${s}" onclick="selectStar(${s})">⭐</span>`).join("")}
-    </div>
-    <div class="star-label" id="starLabel">กรุณาเลือกคะแนน</div>
-    <div class="section-label">ความคิดเห็น (ไม่บังคับ)</div>
-    <textarea id="comment" rows="3" placeholder="เขียนความคิดเห็นเพิ่มเติม..."></textarea>
-    <button class="btn btn-submit" id="submitBtn" disabled onclick="submitRating()">ส่งคะแนน</button>
-  `;
-}
-
-function selectStar(score) {
-  selectedScore = score;
-  document.querySelectorAll(".star").forEach((el, i) => {
-    el.classList.toggle("active", i < score);
+function pick(el) {
+  const g = el.dataset.g;
+  const v = parseInt(el.dataset.v);
+  sc[g] = v;
+  document.querySelectorAll(`.star[data-g="${g}"]`).forEach(s => {
+    s.classList.toggle("on", parseInt(s.dataset.v) <= v);
   });
-  document.getElementById("starLabel").textContent = STAR_LABELS[score];
-  document.getElementById("submitBtn").disabled = false;
+  document.getElementById("sb").disabled = !(sc[1] && sc[2] && sc[3] && sc[4]);
 }
 
-async function submitRating() {
-  if (!selectedScore) return;
-  const btn     = document.getElementById("submitBtn");
-  const comment = document.getElementById("comment").value.trim();
-  btn.disabled  = true;
-  btn.textContent = "⏳ กำลังส่ง...";
-  try {
-    const url = GAS_URL + "?type=rate_job&jobId=" + encodeURIComponent(jobId)
-              + "&score=" + selectedScore
-              + "&comment=" + encodeURIComponent(comment);
-    const res  = await fetch(url);
-    const data = await res.json();
-    if (data.status === "success" || data.status === "already_rated") {
-      showDone(selectedScore, comment, data.status === "already_rated");
-    } else {
-      btn.disabled    = false;
-      btn.textContent = "ส่งคะแนน";
-      alert("เกิดข้อผิดพลาด: " + data.status);
-    }
-  } catch(e) {
-    btn.disabled    = false;
-    btn.textContent = "ส่งคะแนน";
-    alert("เชื่อมต่อไม่ได้ กรุณาลองใหม่");
-  }
-}
+function send() {
+  const sb = document.getElementById("sb");
+  sb.disabled = true;
+  sb.textContent = "กำลังส่ง...";
+  document.getElementById("err").style.display = "none";
 
-function showDone(score, comment, wasAlready) {
-  document.getElementById("app").innerHTML = `
-    <div class="done-view">
-      <div class="big-star">${"⭐".repeat(Number(score)||0)}</div>
-      <h2>${wasAlready ? "ให้คะแนนไปแล้ว" : "ขอบคุณสำหรับคะแนน!"}</h2>
-      <p>${wasAlready ? "งาน " + jobId + " นี้ได้รับการให้คะแนนแล้ว" : "คะแนนของคุณถูกบันทึกเรียบร้อยแล้ว"}</p>
-      ${comment ? `<p style="margin-top:12px;color:#555;">"${comment}"</p>` : ""}
-    </div>
-  `;
+  fetch(GAS_URL, {
+    method: "POST",
+    mode:   "no-cors",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      type: "rate",
+      jobId: jobId,
+      r1: sc[1], r2: sc[2], r3: sc[3], r4: sc[4]
+    })
+  })
+  .then(() => {
+    document.getElementById("form").style.display = "none";
+    document.getElementById("done").style.display = "block";
+  })
+  .catch(() => {
+    sb.disabled = false;
+    sb.textContent = "ส่งคะแนน ✅";
+    document.getElementById("err").style.display = "block";
+  });
 }
-
-function showError(msg) {
-  document.getElementById("app").innerHTML = `<div class="error">❌ ${msg}</div>`;
-}
-
-function formatDate(d) {
-  if (!d) return "-";
-  const dt = new Date(d);
-  if (isNaN(dt)) return d;
-  return dt.toLocaleDateString("th-TH") + " " + dt.toLocaleTimeString("th-TH", {hour:"2-digit",minute:"2-digit"});
-}
-
-init();
 </script>
 </body>
 </html>
