@@ -3,33 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f4f6fb">
 <title>ให้คะแนนงานซ่อมบำรุง</title>
 <style>
 /* ── ใส่ GAS URL ของคุณตรงนี้ ── */
 /* GAS_URL ถูกกำหนดใน <script> ด้านล่าง */
 
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Sarabun',Helvetica,sans-serif;background:#1a1a2e;color:#eee;padding:20px;min-height:100vh}
+body{font-family:'Sarabun',Helvetica,sans-serif;background:#f4f6fb;color:#2a2a3a;padding:20px;min-height:100vh}
 .wrap{max-width:460px;margin:0 auto}
 h2{text-align:center;color:#ff9800;font-size:22px;margin-bottom:4px}
-.sub{text-align:center;color:#aaa;font-size:13px;margin-bottom:24px;word-break:break-all}
-.card{background:#16213e;border-radius:14px;padding:18px;margin-bottom:14px;
-      box-shadow:0 2px 8px rgba(0,0,0,.4)}
-.clabel{font-size:15px;font-weight:700;color:#ffe082;margin-bottom:14px;line-height:1.4}
+.sub{text-align:center;color:#888;font-size:13px;margin-bottom:24px;word-break:break-all}
+.card{background:#ffffff;border-radius:14px;padding:18px;margin-bottom:14px;
+      box-shadow:0 2px 10px rgba(0,0,0,.08);border:1px solid #eef0f5}
+.clabel{font-size:15px;font-weight:700;color:#e08600;margin-bottom:14px;line-height:1.4}
 .stars{display:flex;justify-content:center;gap:10px}
-.star{font-size:42px;cursor:pointer;color:#2a2a4a;transition:color .1s;
+.star{font-size:42px;cursor:pointer;color:#e2e5ee;transition:color .1s;
       -webkit-tap-highlight-color:transparent;user-select:none;line-height:1}
-.star.on{color:#ffd700}
+.star.on{color:#ffc107}
 .star:active{transform:scale(1.2)}
-.btn{width:100%;padding:15px;background:#ff9800;color:#000;
+.btn{width:100%;padding:15px;background:#ff9800;color:#fff;
      font-size:18px;font-weight:700;border:none;border-radius:12px;
-     cursor:pointer;margin-top:8px;letter-spacing:.5px}
-.btn:disabled{background:#333;color:#555;cursor:default}
+     cursor:pointer;margin-top:8px;letter-spacing:.5px;box-shadow:0 4px 14px rgba(255,152,0,.35)}
+.btn:disabled{background:#e0e0e0;color:#aaa;box-shadow:none;cursor:default}
 #done{display:none;text-align:center;padding:60px 20px}
 .done-icon{font-size:64px}
-.done-text{font-size:22px;color:#66bb6a;margin-top:16px;font-weight:700}
-.done-sub{font-size:14px;color:#aaa;margin-top:8px}
-#err{display:none;text-align:center;color:#ef5350;padding:12px;font-size:14px}
+.done-text{font-size:22px;color:#2e7d32;margin-top:16px;font-weight:700}
+.done-sub{font-size:14px;color:#888;margin-top:8px}
+#err{display:none;text-align:center;color:#d32f2f;padding:12px;font-size:14px}
 </style>
 </head>
 <body>
